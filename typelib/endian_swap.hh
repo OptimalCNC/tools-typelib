@@ -3,6 +3,7 @@
 
 #include <boost/integer.hpp>
 #include <boost/predef/other/endian.h>
+#include <cstring>
 
 namespace Typelib
 {
@@ -46,7 +47,11 @@ namespace Typelib
         inline void swap(const S data, S& buffer)
         {
             typedef typename Details::type_from_size<sizeof(S) * 8>::least T;
-            Details::swap_helper<sizeof(S), T> (reinterpret_cast<const T&>(data), reinterpret_cast<T&>(buffer));
+            T source;
+            T swapped;
+            std::memcpy(&source, &data, sizeof(S));
+            Details::swap_helper<sizeof(S), T>(source, swapped);
+            std::memcpy(&buffer, &swapped, sizeof(S));
         }
 
         /* Returns the value of \c data with endianness swapped */
@@ -120,4 +125,3 @@ namespace Typelib
 }
 
 #endif
-
