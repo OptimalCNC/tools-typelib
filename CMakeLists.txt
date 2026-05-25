@@ -4,8 +4,9 @@ PROJECT(typelib)
 SET(PROJECT_VERSION 1.2)
 SET(API_VERSION 1)
 
-#required because of the use of std::unique_ptr
-set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 FIND_PACKAGE ( Threads REQUIRED )
 
