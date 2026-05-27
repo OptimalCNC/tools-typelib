@@ -312,7 +312,7 @@ module Typelib
             raise ArgumentError, "expected a class as second argument, got #{to}"
         end
 
-        convertions_to_ruby.add(typename, Convertion.new(typename, ruby_class, lambda(&block)), options)
+        convertions_to_ruby.add(typename, Convertion.new(typename, ruby_class, block), options)
     end
 
     # Define specialized convertions from Ruby objects to Typelib-managed
@@ -346,6 +346,10 @@ module Typelib
             raise ArgumentError, "expected a class as first argument, got #{ruby_class}"
         end
 
-        convertions_from_ruby.add(typename, Convertion.new(typename, ruby_class, lambda(&block)), options)
+        unless block
+            raise ArgumentError, "tried to create Proc object without a block"
+        end
+
+        convertions_from_ruby.add(typename, Convertion.new(typename, ruby_class, block), options)
     end
 end

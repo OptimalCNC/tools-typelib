@@ -70,4 +70,25 @@ class TC_RubyMappingCustomization < Minitest::Test
 end
 
 class TC_Specializations < Minitest::Test
+    def test_global_convert_to_ruby_does_not_rewrap_the_captured_block
+        _out, err = capture_io do
+            Typelib.convert_to_ruby "/TC_Specializations/ToRuby", String do
+            end
+        end
+
+        refute_match(/lambda without a literal block/, err)
+    ensure
+        Typelib.convertions_to_ruby.from_typename.delete("/TC_Specializations/ToRuby")
+    end
+
+    def test_global_convert_from_ruby_does_not_rewrap_the_captured_block
+        _out, err = capture_io do
+            Typelib.convert_from_ruby String, "/TC_Specializations/FromRuby" do
+            end
+        end
+
+        refute_match(/lambda without a literal block/, err)
+    ensure
+        Typelib.convertions_from_ruby.from_typename.delete("/TC_Specializations/FromRuby")
+    end
 end

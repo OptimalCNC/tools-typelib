@@ -193,7 +193,6 @@ module Typelib
             end
 
             if block
-                block = lambda(&block)
                 m = Module.new do
                     define_method(:to_ruby, &block)
                 end
@@ -208,7 +207,11 @@ module Typelib
         # Extends this type class to have be able to use the Ruby class +from+
         # to initialize a value of type +self+
         def self.convert_from_ruby(from, &block)
-            convertions_from_ruby[from] = lambda(&block)
+            unless block
+                raise ArgumentError, "tried to create Proc object without a block"
+            end
+
+            convertions_from_ruby[from] = block
         end
 
         # Called by Typelib when a subclass is created.
