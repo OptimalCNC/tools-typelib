@@ -551,17 +551,17 @@ static VALUE registry_available_container(VALUE registry_module)
 static VALUE registry_define_container(VALUE registry, VALUE kind, VALUE element, VALUE _size)
 {
     Registry& reg = rb2cxx::object<Registry>(registry);
-    Type const& element_type(rb2cxx::object<Type>(element));
+    Type const* element_type = &rb2cxx::object<Type>(element);
     // Check that +reg+ contains +element_type+
-    if (!reg.isIncluded(element_type))
+    if (!reg.isIncluded(*element_type))
         rb_raise(rb_eArgError, "the given type object comes from a different type registry");
 
     try {
-        Container const& new_type = Container::createContainer(reg, StringValuePtr(kind), element_type);
+        Container const* new_type = &Container::createContainer(reg, StringValuePtr(kind), *element_type);
         size_t size = NUM2INT(_size);
         if (size != 0)
-            reg.get_(new_type).setSize(size);
-        return cxx2rb::type_wrap(new_type, registry);
+            reg.get_(*new_type).setSize(size);
+        return cxx2rb::type_wrap(*new_type, registry);
     } catch(Typelib::UnknownContainer const&) {
         rb_raise(eNotFound, "%s is not a known container type", StringValuePtr(kind));
     }
@@ -748,4 +748,3 @@ void typelib_ruby::Typelib_init_registry()
     rb_define_singleton_method(cRegistry, "available_containers", RUBY_METHOD_FUNC(registry_available_container), 0);
     rb_define_method(cRegistry, "define_container", RUBY_METHOD_FUNC(registry_define_container), 3);
 }
-

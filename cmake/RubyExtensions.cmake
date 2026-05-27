@@ -29,16 +29,26 @@ ELSEIF(NOT RUBY_EXTENSIONS_AVAILABLE)
        OUTPUT_VARIABLE RUBY_CFLAGS)
     STRING(REPLACE "\n" "" RUBY_CFLAGS ${RUBY_CFLAGS})
 
+    EXECUTE_PROCESS(COMMAND ${RUBY_EXECUTABLE} -r rbconfig -e "puts RbConfig::CONFIG['CXXFLAGS']"
+       OUTPUT_VARIABLE RUBY_CXXFLAGS)
+    STRING(REPLACE "\n" "" RUBY_CXXFLAGS ${RUBY_CXXFLAGS})
+
     MACRO(ADD_RUBY_EXTENSION target)
         list(GET RUBY_INCLUDE_PATH 0 ruby_path)
         GET_FILENAME_COMPONENT(rubylib_path ${ruby_path} PATH)
         LINK_DIRECTORIES(${rubylib_path})
 
         INCLUDE_DIRECTORIES(${RUBY_INCLUDE_PATH})
-        SET_SOURCE_FILES_PROPERTIES(${ARGN} PROPERTIES COMPILE_FLAGS "${RUBY_CFLAGS}")
         ADD_LIBRARY(${target} MODULE ${ARGN})
+        foreach(source ${ARGN})
+            get_filename_component(source_extension "${source}" EXT)
+            if(source_extension MATCHES "^\\.(cc|cpp|cxx|C|c\\+\\+)$")
+                SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES COMPILE_FLAGS "${RUBY_CXXFLAGS}")
+            else()
+                SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES COMPILE_FLAGS "${RUBY_CFLAGS}")
+            endif()
+        endforeach()
         target_link_libraries(${target} ${RUBY_LIBRARY})
         SET_TARGET_PROPERTIES(${target} PROPERTIES PREFIX "")
     ENDMACRO(ADD_RUBY_EXTENSION)
 ENDIF(NOT RUBY_INCLUDE_PATH)
-
