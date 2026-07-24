@@ -20,7 +20,7 @@ namespace Typelib
 
     public:
         ImportError(const std::string& file, const std::string& what_ = "", int line = 0, int column = 0);
-        ~ImportError() throw();
+        ~ImportError() noexcept override;
 
         void setFile(const std::string& path);
         /** The file in which the exception occured */
@@ -74,4 +74,3 @@ namespace Typelib
 }
 
 #endif
-
