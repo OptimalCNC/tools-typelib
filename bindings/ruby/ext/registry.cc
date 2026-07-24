@@ -715,8 +715,10 @@ void typelib_ruby::Typelib_init_registry()
 
     VALUE mTypelib  = rb_define_module("Typelib");
     cRegistry = rb_define_class_under(mTypelib, "Registry", rb_cObject);
+    VALUE cCXXRegistry = rb_define_class_under(mTypelib, "CXXRegistry", cRegistry);
     eNotFound = rb_define_class_under(mTypelib, "NotFound", rb_eRuntimeError);
     rb_define_alloc_func(cRegistry, registry_alloc);
+    rb_define_alloc_func(cCXXRegistry, registry_alloc);
     rb_define_method(cRegistry, "size", RUBY_METHOD_FUNC(registry_size), 0);
     rb_define_method(cRegistry, "get", RUBY_METHOD_FUNC(registry_do_get), 1);
     rb_define_method(cRegistry, "build", RUBY_METHOD_FUNC(registry_do_build), -1);

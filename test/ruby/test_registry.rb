@@ -10,6 +10,13 @@ class TC_Registry < Minitest::Test
         reg.create_numeric "/int32_t", 4, :sint
     end
 
+    def test_cxx_registry_uses_the_native_registry_allocator
+        registry = CXXRegistry.new
+
+        assert_instance_of CXXRegistry, registry
+        assert registry.include?("/int32_t")
+    end
+
     def test_aliasing
         registry = CXXRegistry.new
         registry.alias "/my_own_and_only_int", "/int"
