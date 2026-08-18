@@ -2,6 +2,9 @@
 #define __RUBY_EXT_TYPELIB_HH__
 
 #include <ruby.h>
+#ifdef copysign
+# undef copysign
+#endif
 #include <typelib/typemodel.hh>
 #include <typelib/value.hh>
 #include <typelib/registry.hh>

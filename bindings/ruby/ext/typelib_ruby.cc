@@ -44,7 +44,8 @@ static VALUE typelib_is_big_endian(VALUE mod)
 #endif
 }
 
-extern "C" void Init_typelib_ruby()
+extern "C" {
+RUBY_FUNC_EXPORTED void Init_typelib_ruby()
 {
     mTypelib  = rb_define_module("Typelib");
     Typelib_init_values();
@@ -57,5 +58,6 @@ extern "C" void Init_typelib_ruby()
 
     rb_define_singleton_method(rb_mKernel, "immediate?", RUBY_METHOD_FUNC(kernel_is_immediate), 1);
     rb_define_singleton_method(rb_mKernel, "numeric?", RUBY_METHOD_FUNC(kernel_is_numeric), 1);
+}
 }
 

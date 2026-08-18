@@ -854,7 +854,7 @@ module Typelib
             # have a source file/line
             registry.each do |type|
                 if location = type.metadata.get("source_file_line").first
-                    file, line = location.split(":")
+                    file, _, line = location.rpartition(":")
                     line = Integer(line)
                     if doc = GCCXMLLoader.parse_cxx_documentation_before(source_file_content(file), line)
                         type.metadata.set("doc", doc)
@@ -864,7 +864,7 @@ module Typelib
                 if type.respond_to?(:field_metadata)
                     type.field_metadata.each do |field_name, md|
                         if location = md.get("source_file_line").first
-                            file, line = location.split(":")
+                            file, _, line = location.rpartition(":")
                             line = Integer(line)
                             if doc = GCCXMLLoader.parse_cxx_documentation_before(source_file_content(file), line)
                                 md.set("doc", doc)

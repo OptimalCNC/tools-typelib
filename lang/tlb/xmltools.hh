@@ -2,6 +2,7 @@
 #define TYPELIB_LANG_TLB_XMLTOOLS_HH
 
 #include <libxml/xmlmemory.h>
+#include <libxml/tree.h>
 #include "parsing.hh"
 #include <boost/lexical_cast.hpp>
 

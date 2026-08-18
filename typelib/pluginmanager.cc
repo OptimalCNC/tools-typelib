@@ -5,7 +5,11 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
-#include <dlfcn.h>
+#ifdef _WIN32
+# include <windows.h>
+#else
+# include <dlfcn.h>
+#endif
 
 using namespace std;
 using namespace Typelib;
@@ -42,12 +46,16 @@ PluginManager::PluginManager()
     // use the environment variable to override the load-path
     if (const char* pluginPath = getenv("TYPELIB_PLUGIN_PATH")) {
         // the delimiter inside the env-var
+#ifdef _WIN32
+        const std::string delim(";");
+#else
         const std::string delim(":");
+#endif
         // make a copy of the env-var, which we can modify
         std::string s(pluginPath);
         // we need ":" at the end, to catch the last entry in the list
         if (s.find_last_of(delim) != s.length())
-            s += ":";
+            s += delim;
         // pos of delim for initial loop
         size_t pos = s.find(delim);
         do {
@@ -96,7 +104,8 @@ bool PluginManager::loadPluginFromDirectory(std::string const& directory)
     directory_iterator end_it;
     for (directory_iterator it(plugin_dir); it != end_it; ++it)
     {
-        if (it->path().extension() == ".so" || it->path().extension() == ".dylib")
+        if (it->path().extension() == ".so" || it->path().extension() == ".dylib" ||
+            it->path().extension() == ".dll")
 #if BOOST_VERSION >= 104600
             success |= loadPlugin(it->path().string());
 #else
@@ -112,17 +121,36 @@ bool PluginManager::loadPluginFromDirectory(std::string const& directory)
 
 bool PluginManager::loadPlugin(std::string const& path)
 {
+#ifdef _WIN32
+    void* libhandle = LoadLibraryA(path.c_str());
+#else
     void* libhandle = dlopen(path.c_str(), RTLD_LAZY);
+#endif
     if (!libhandle)
     {
+#ifdef _WIN32
+        cerr << "typelib: cannot load plugin " << path
+             << ": Windows error " << GetLastError() << endl;
+#else
         cerr << "typelib: cannot load plugin " << path << ": " << dlerror() << endl;
+#endif
         return false;
     }
 
+#ifdef _WIN32
+    void* libentry = reinterpret_cast<void*>(GetProcAddress(
+        static_cast<HMODULE>(libhandle), "registerPlugins"));
+#else
     void* libentry  = dlsym(libhandle, "registerPlugins");
+#endif
     if (!libentry)
     {
         cerr << "typelib: '" << path << "' does not seem to be a valid typelib plugin" << endl;
+#ifdef _WIN32
+        FreeLibrary(static_cast<HMODULE>(libhandle));
+#else
+        dlclose(libhandle);
+#endif
         return false;
     }
 

@@ -5,6 +5,9 @@
 #include "value_ops_details.hh"
 #include <cstdio>
 #include <cstring>
+#ifdef _WIN32
+# include <io.h>
+#endif
 
 using namespace Typelib;
 
@@ -650,13 +653,17 @@ struct FDOutputStream : public OutputStream
 
     void write(boost::uint8_t const* data, size_t size)
     {
+#ifdef _WIN32
+        int ret = ::_write(fd, data, static_cast<unsigned int>(size));
+#else
         ssize_t ret = ::write(fd, data, size);
+#endif
         if (ret < 0) {
             throw std::runtime_error(
                 "write failed in ValueOps::dump: " + std::string(strerror(errno))
             );
         }
-        else if (ret != static_cast<ssize_t>(size)) {
+        else if (static_cast<size_t>(ret) != size) {
             throw std::runtime_error("wrote fewer bytes than expected in ValueOps::dump");
         }
     }

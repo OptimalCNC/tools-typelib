@@ -14,8 +14,10 @@ FIND_PACKAGE ( Threads REQUIRED )
 # is compatible with the NEW policy, so just set it to avoid getting a cmake
 # warning
 cmake_policy(SET CMP0007 NEW)
-add_compile_options(-Werror=return-type)
-add_compile_options(-Werror=switch)
+if(NOT MSVC)
+    add_compile_options(-Werror=return-type)
+    add_compile_options(-Werror=switch)
+endif()
 
 # make the clang-based importer optional for now. the option is planned to be
 # removed in the future, after using the new importer as default.
@@ -39,7 +41,11 @@ if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-add_definitions(-Wall)
+if(MSVC)
+    add_compile_options(/W3)
+else()
+    add_compile_options(-Wall)
+endif()
 CMAKE_USE_FULL_RPATH("${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/typelib")
 
 set(ROCK_USE_SANITIZERS "" CACHE STRING "Which sanitizers to enable during the build (comma separated, compiler specific)")

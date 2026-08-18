@@ -12,14 +12,18 @@ set_source_files_properties(pluginmanager.cc PROPERTIES
    COMPILE_FLAGS -DTYPELIB_HARDCODED_PLUGIN_PATH=\\"${TYPELIB_PLUGIN_PATH}\\")
 endif (NOT TYPELIB_HARDCODED_PLUGIN_PATH)
 
-set_source_files_properties(endianness.cc PROPERTIES
-    COMPILE_FLAGS -fno-strict-aliasing)
+if(NOT MSVC)
+    set_source_files_properties(endianness.cc PROPERTIES
+        COMPILE_FLAGS -fno-strict-aliasing)
+endif()
 
-target_link_libraries(typeLib pthread ${CMAKE_DL_LIBS} ${Boost_FILESYSTEM_LIBRARIES} ${Boost_SYSTEM_LIBRARIES} ${Boost_THREAD_LIBRARIES})
+target_link_libraries(typeLib Threads::Threads ${CMAKE_DL_LIBS} ${Boost_FILESYSTEM_LIBRARIES} ${Boost_SYSTEM_LIBRARIES} ${Boost_THREAD_LIBRARIES})
 #TARGET_LINK_LIBRARIES(typeLib typeLang_c typeLang_tlb typeLang_idl)
 
 install(TARGETS typeLib
-    LIBRARY DESTINATION lib)
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
 set_target_properties(typeLib PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${API_VERSION})

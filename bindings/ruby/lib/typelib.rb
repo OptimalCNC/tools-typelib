@@ -165,7 +165,7 @@ module Typelib
             return
         end
 
-        ENV["TYPELIB_RUBY_PLUGIN_PATH"].split(":").each do |dir|
+        ENV["TYPELIB_RUBY_PLUGIN_PATH"].split(File::PATH_SEPARATOR).each do |dir|
             specific_file = File.join(dir, "typelib_plugin.rb")
             if File.exist?(specific_file)
                 if require(specific_file)
