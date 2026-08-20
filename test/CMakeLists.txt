@@ -30,6 +30,15 @@ endif()
 ADD_TEST(CxxSuiteInstalledPlugins ${CMAKE_CURRENT_BINARY_DIR}/typelib_testsuite)
 ADD_TEST(CxxSuiteLocalPlugins ${CMAKE_CURRENT_BINARY_DIR}/typelib_testsuite
     ${__boost_test_parameters})
+# Keep Ruby's own headers out of the project warning budget for extensions.
+if(RUBY_EXTENSIONS_AVAILABLE)
+    ADD_TEST(
+        NAME RubyExtensionSystemIncludes
+        COMMAND ${CMAKE_COMMAND}
+            -DTYPELIB_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
+            -DTYPELIB_TEST_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/RubyExtensionSystemIncludes.cmake)
+endif()
 # the pluginmanager can load plugins from a list of paths set in the
 # environment. for testing we don't want to use the plugins in the
 # install-folder, but the freshly compiled ones in the build-folder. note that

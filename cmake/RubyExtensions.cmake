@@ -38,7 +38,7 @@ ELSEIF(NOT RUBY_EXTENSIONS_AVAILABLE)
         GET_FILENAME_COMPONENT(rubylib_path ${ruby_path} PATH)
         LINK_DIRECTORIES(${rubylib_path})
 
-        INCLUDE_DIRECTORIES(${RUBY_INCLUDE_PATH})
+        INCLUDE_DIRECTORIES(SYSTEM ${RUBY_INCLUDE_PATH})
         ADD_LIBRARY(${target} MODULE ${ARGN})
         foreach(source ${ARGN})
             get_filename_component(source_extension "${source}" EXT)
